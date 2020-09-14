@@ -42,18 +42,21 @@ void openFile(char fileName[]) {
     dataTable[1] = calloc(sizeof(char*),fileLength);
     dataTable[2] = calloc(sizeof(char*),fileLength);
     int col0Char,col1Char, col2Char;
+    int col0Max=0;
+    int col1Max=0;
+    int col2Max=0;
     //while for new line
     // while(!feof(filePtr)){
     for(int lines=0; lines<fileLength; lines++){
         thirdColumn = 0;
-        character = getc(filePtr);
+        character = 'a';
         column = 0;
-        dataTable[0][lines] = calloc(0,0);
-        dataTable[1][lines] = calloc(0,0);
-        dataTable[2][lines] = calloc(0,0);
-        dataTable[0][lines] = NULL;
-        dataTable[1][lines] = NULL;
-        dataTable[2][lines] = NULL;
+        dataTable[0][lines] = malloc(1);
+        dataTable[1][lines] = malloc(1);
+        dataTable[2][lines] = malloc(1);
+        dataTable[0][lines][0] = '\0';
+        dataTable[1][lines][0] = '\0';
+        dataTable[2][lines][0] = '\0';
         col0Char=0;
         col1Char=0;
         col2Char=0;
@@ -69,45 +72,52 @@ void openFile(char fileName[]) {
                     ++column;
                 }else{
                     if(column == 0){
-                        col0Char++;
-                        dataTable[column][lines] = realloc(dataTable[column][lines], col0Char);
+                        ++col0Char;
+                        dataTable[column][lines] = realloc(dataTable[column][lines], col0Char+1);
+                        // dataTable[column][lines][col0Char-1] = character;
+                        if(col0Char>col0Max)
+                            col0Max = col0Char;
                     }
                     if(column == 1){
-                        col1Char++;
-                        dataTable[column][lines] = realloc(dataTable[column][lines], col1Char);
+                        ++col1Char;
+                        dataTable[column][lines] = realloc(dataTable[column][lines], col1Char+1);
+                        // dataTable[column][lines][col1Char-1] = character;
+                        if(col1Char>col1Max)
+                            col1Max = col1Char;
                     }
                     if(column == 2){
-                        col2Char++;
-                        dataTable[column][lines] = realloc(dataTable[column][lines], col2Char);
+                        ++col2Char;
+                        dataTable[column][lines] = realloc(dataTable[column][lines], col2Char+1);
+                        // dataTable[column][lines][col2Char-1] = character;
+                        if(col2Char>col2Max)
+                            col2Max = col2Char;
                     }
-
-                        strncat(dataTable[column][lines], &character, 1);
+                        //strcat(dataTable[column][lines], &character);
+                       strncat(dataTable[column][lines], &character, 1);
                 }
             }
         }
     }
+
     fclose(filePtr);
-    
-    int col0Max=0;
-    int col1Max=0;
-    int col2Max=0;
 
-    for(int i=0; i< fileLength; i++){
-        int temp0 =strlen(dataTable[0][i]);
-        int temp1 =strlen(dataTable[1][i]);
-        int temp2 =strlen(dataTable[2][i]);
+    // for(int i=0; i< fileLength; i++){
+    //     int temp0 =strlen(dataTable[0][i]);
+    //     int temp1 =strlen(dataTable[1][i]);
+    //     int temp2 =strlen(dataTable[2][i]);
 
-        if(temp0>col0Max)
-            col0Max=temp0;
-        if(temp1>col1Max)
-            col1Max=temp1;
-        if(temp2>col2Max)
-            col2Max=temp2;
-    }
+    //     if(temp0>col0Max)
+    //         col0Max=temp0;
+    //     if(temp1>col1Max)
+    //         col1Max=temp1;
+    //     if(temp2>col2Max)
+    //         col2Max=temp2;
+    // }
+
     printline(col0Max+col1Max+col2Max);
     for(int i=0; i< fileLength; i++){
         printf("|");
-        printf(" %s ",dataTable[0][i]);
+        printf(" %s ", dataTable[0][i]);
         printSpaces(col0Max-strlen(dataTable[0][i]));
         printf("|");
         printSpaces(col1Max-strlen(dataTable[1][i]));
@@ -122,6 +132,10 @@ void openFile(char fileName[]) {
         free(dataTable[1][i]);
         free(dataTable[2][i]);
     }
+    free(dataTable[0]);
+    free(dataTable[1]);
+    free(dataTable[2]);
+
     printline(col0Max+col1Max+col2Max);
 }
 
