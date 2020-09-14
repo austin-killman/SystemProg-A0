@@ -27,35 +27,37 @@ int getFileLineNumber(char fileName[]) {
         }
     }
     fclose(filePtr);
-
     return lines;
 }
 
 void openFile(char fileName[]) {
     const int fileLength = getFileLineNumber(fileName);
     FILE * filePtr = fopen(fileName, "r"); 
-    if (filePtr == NULL){
-        printf("rut ro");
-    };
-    // char line[100];
     char character;
-    int8_t thirdColumn;
-    int lines = -1;
+    int thirdColumn;
+    // int lines = -1;
     int column = 0;
-    char * dataTable[3][fileLength];
+    char ** dataTable[3];
+    dataTable[0] = calloc(sizeof(char*),fileLength);
+    dataTable[1] = calloc(sizeof(char*),fileLength);
+    dataTable[2] = calloc(sizeof(char*),fileLength);
+    int col0Char,col1Char, col2Char;
     //while for new line
-    while(!feof(filePtr)){
+    // while(!feof(filePtr)){
+    for(int lines=0; lines<fileLength; lines++){
         thirdColumn = 0;
         character = getc(filePtr);
-        ++lines;
         column = 0;
-        // For new Line
-        if(lines<fileLength) {
-            dataTable[0][lines] = malloc(sizeof(char)*1);
-            dataTable[1][lines] = malloc(sizeof(char)*1);
-            dataTable[2][lines] = malloc(sizeof(char)*1);
-        }
-
+        dataTable[0][lines] = calloc(0,0);
+        dataTable[1][lines] = calloc(0,0);
+        dataTable[2][lines] = calloc(0,0);
+        dataTable[0][lines] = NULL;
+        dataTable[1][lines] = NULL;
+        dataTable[2][lines] = NULL;
+        col0Char=0;
+        col1Char=0;
+        col2Char=0;
+        // free(str);
         while(character != '\n' && character != EOF) {
             // printf("%c", character);
             character = getc(filePtr);
@@ -65,9 +67,22 @@ void openFile(char fileName[]) {
             } else {
                 if(character==' ' && thirdColumn == 0) {
                     ++column;
+                }else{
+                    if(column == 0){
+                        col0Char++;
+                        dataTable[column][lines] = realloc(dataTable[column][lines], col0Char);
+                    }
+                    if(column == 1){
+                        col1Char++;
+                        dataTable[column][lines] = realloc(dataTable[column][lines], col1Char);
+                    }
+                    if(column == 2){
+                        col2Char++;
+                        dataTable[column][lines] = realloc(dataTable[column][lines], col2Char);
+                    }
+
+                        strncat(dataTable[column][lines], &character, 1);
                 }
-                // need to add rollac for dataTable later
-                strncat(dataTable[column][lines], &character, 1);
             }
         }
     }
@@ -93,22 +108,25 @@ void openFile(char fileName[]) {
     for(int i=0; i< fileLength; i++){
         printf("|");
         printf(" %s ",dataTable[0][i]);
-        printSpaces(col1Max-strlen(dataTable[0][i]));
+        printSpaces(col0Max-strlen(dataTable[0][i]));
         printf("|");
         printSpaces(col1Max-strlen(dataTable[1][i]));
-        printf("%s ",dataTable[1][i]);
+        printf(" %s ",dataTable[1][i]);
         printf("|");
-        printf("%s ",dataTable[2][i]);
+        printf(" %s ",dataTable[2][i]);
         printSpaces(col2Max-strlen(dataTable[2][i]));
         printf("|\n");
         if(i == 0)
             printline(col0Max+col1Max+col2Max);
+        free(dataTable[0][i]);
+        free(dataTable[1][i]);
+        free(dataTable[2][i]);
     }
     printline(col0Max+col1Max+col2Max);
 }
 
 void printline(int length) {
-    for(int i=0; i<length+8; i++){
+    for(int i=0; i<length+10; i++){
         printf("-");
     }
     printf("\n");
